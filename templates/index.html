@@ -11,50 +11,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 .app{width:100%;max-width:820px}
 .card{background:#111113;border:1px solid #1e1e22;border-radius:24px;padding:32px;box-shadow:0 8px 40px rgba(0,0,0,.5)}
 
-/* Header */
 .header{display:flex;align-items:center;gap:12px;margin-bottom:28px}
 .header-logo{width:38px;height:38px;background:#ff4444;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;flex-shrink:0}
 .header h1{font-size:18px;font-weight:600;letter-spacing:-.3px;color:#e8e8ed}
-.header span{color:#444;font-size:12px;margin-left:auto;letter-spacing:.2px}
 
-/* Layout */
 .columns{display:grid;grid-template-columns:1fr 240px;gap:32px}
 @media(max-width:700px){.columns{grid-template-columns:1fr;gap:24px}}
+.columns>div{display:flex}
 
-/* Columns stretch */
-.columns > div{display:flex}
-
-/* Download column */
 .download-panel{background:#0e0e10;border:1px solid #1a1a1e;border-radius:12px;padding:20px;flex:1;display:flex;flex-direction:column;justify-content:center}
 .download-panel form{width:100%}
+
 .input-wrap{position:relative;margin-bottom:14px}
 .input-wrap .icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#333;font-size:14px;pointer-events:none;line-height:1}
 input[type=url]{width:100%;padding:13px 14px 13px 38px;background:#18181c;border:1px solid #242428;border-radius:10px;color:#e8e8ed;font-size:14px;outline:none;transition:border .2s}
 input[type=url]:focus{border-color:#ff444433}
 input[type=url]::placeholder{color:#38383c}
+input[type=url]:disabled{opacity:.4;cursor:not-allowed}
 
-/* Format chips */
 .chips{display:flex;gap:8px;margin-bottom:16px}
 .chip{flex:1;position:relative}
 .chip input{display:none}
 .chip label{display:block;padding:11px;text-align:center;background:#18181c;border:1px solid #242428;border-radius:10px;color:#555;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s}
 .chip label:hover{border-color:#333338;color:#888}
 .chip input:checked+label{border-color:#ff444455;background:#221314;color:#ff4444}
+.chip label.disabled{opacity:.4;cursor:not-allowed}
 
 .btn-download{width:100%;padding:13px;background:#ff4444;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
 .btn-download:hover{background:#e03030}
 .btn-download:disabled{background:#1e1212;color:#441e1e;cursor:not-allowed}
 
-/* Settings column */
 .settings{background:#0e0e10;border:1px solid #1a1a1e;border-radius:12px;padding:16px;flex:1}
 .setting+.setting{margin-top:14px}
 .setting-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
 .setting-label span{font-size:12px;color:#555;font-weight:500}
-.setting-label .hint{color:#333;font-size:11px}
 .setting select,.setting input[type=text],.setting input[type=number]{width:100%;padding:9px 11px;background:#18181c;border:1px solid #242428;border-radius:8px;color:#e8e8ed;font-size:13px;outline:none;transition:border .2s}
 .setting select:focus,.setting input:focus{border-color:#ff444433}
 .setting select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='%23555'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;cursor:pointer}
-.setting select:disabled{opacity:.3;cursor:not-allowed}
 
 .toggle{display:flex;align-items:center;justify-content:space-between}
 .toggle-info span{font-size:12px;color:#555}
@@ -68,27 +61,25 @@ input[type=url]::placeholder{color:#38383c}
 .btn-save{width:100%;padding:9px;border:none;border-radius:8px;background:#ff444422;color:#ff4444;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
 .btn-save:hover{background:#ff444433}
 
-/* Status bar */
+/* Progress bar */
+.progress-section{display:none;margin-top:20px}
+.progress-section.active{display:block}
+.progress-bar{background:#18181c;border-radius:8px;height:20px;overflow:hidden;position:relative}
+.progress-fill{height:100%;background:#ff4444;border-radius:8px;transition:width .3s ease;width:0%}
+.progress-text{display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:#666}
+.progress-label{font-size:13px;color:#888;margin-bottom:10px}
+.progress-actions{display:flex;gap:10px;margin-top:12px}
+.btn-cancel{flex:1;padding:10px;background:transparent;border:1px solid #333;border-radius:8px;color:#666;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-cancel:hover{border-color:#ff444444;color:#ff4444}
+
 .status-bar{margin-top:20px;padding:0 4px}
 .status{display:none;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;font-size:13px}
 .status.active{display:flex}
-.status.loading{background:#0e0e14;border:1px solid #1a1a22;color:#666}
 .status.error{background:#141010;border:1px solid #2e1515;color:#ff4444}
 .status.success{background:#101410;border:1px solid #152e15;color:#44cc55}
 .status-confirm{background:#0e0e14;border:1px solid #1a1a22;color:#666}
 .status-icon{font-size:14px;flex-shrink:0}
 
-/* Spinner */
-.spinner{display:none;margin-top:20px;padding:24px;background:#0e0e10;border:1px solid #1a1a1e;border-radius:12px;flex-direction:column;align-items:center;gap:12px}
-.spinner.active{display:flex}
-.dots{display:flex;gap:5px}
-.dots div{width:7px;height:7px;background:#ff4444;border-radius:50%;animation:bounce 1.4s ease-in-out infinite}
-.dots div:nth-child(2){animation-delay:.16s}
-.dots div:nth-child(3){animation-delay:.32s}
-@keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
-.spinner-text{color:#444;font-size:12px}
-
-/* Overlay / Modal */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
 .overlay.active{display:flex}
 .modal{background:#111113;border:1px solid #1e1e22;border-radius:20px;padding:28px;width:90%;max-width:340px;text-align:center}
@@ -103,15 +94,12 @@ input[type=url]::placeholder{color:#38383c}
 
 <div class="app">
   <div class="card">
-
     <div class="header">
       <div class="header-logo">YT</div>
       <h1>YT Downloader</h1>
     </div>
 
     <div class="columns">
-
-      <!-- Left: Download -->
       <div>
         <div class="download-panel">
           <form id="form">
@@ -119,7 +107,6 @@ input[type=url]::placeholder{color:#38383c}
               <span class="icon">🔗</span>
               <input type="url" id="url-input" placeholder="https://youtube.com/watch?v=..." required autocomplete="off">
             </div>
-
             <div class="chips">
               <div class="chip">
                 <input type="radio" name="format" value="mp4" id="fmt-mp4">
@@ -130,19 +117,29 @@ input[type=url]::placeholder{color:#38383c}
                 <label for="fmt-mp3">MP3</label>
               </div>
             </div>
-
             <button type="submit" class="btn-download" id="btn">Скачать</button>
           </form>
+
+          <div class="progress-section" id="progress-section">
+            <div class="progress-label" id="progress-label">Скачивание...</div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-text">
+              <span id="progress-pct">0%</span>
+              <span id="progress-speed"></span>
+            </div>
+            <div class="progress-actions">
+              <button class="btn-cancel" id="btn-cancel">Отменить</button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Right: Settings -->
       <div>
         <div class="settings">
           <div class="setting" id="quality-row">
-            <div class="setting-label">
-              <span>Качество</span>
-            </div>
+            <div class="setting-label"><span>Качество</span></div>
             <select id="cfg-quality">
               <option value="360">360p</option>
               <option value="480">480p</option>
@@ -151,7 +148,6 @@ input[type=url]::placeholder{color:#38383c}
               <option value="max">Макс.</option>
             </select>
           </div>
-
           <div class="setting">
             <div class="toggle">
               <div class="toggle-info">
@@ -161,40 +157,23 @@ input[type=url]::placeholder{color:#38383c}
               <div class="toggle-switch" id="cfg-cleanup"></div>
             </div>
           </div>
-
           <div class="setting">
-            <div class="setting-label">
-              <span>Очищать через (ч)</span>
-            </div>
+            <div class="setting-label"><span>Очищать через (ч)</span></div>
             <input type="number" id="cfg-hours" min="1" max="168" value="1">
           </div>
-
           <div class="setting-actions">
             <button class="btn-save" id="settings-save">Сохранить</button>
           </div>
         </div>
       </div>
-
     </div>
 
-    <!-- Status & Spinner (full width, below columns) -->
     <div class="status-bar">
       <div class="status" id="status"></div>
     </div>
-
-    <div class="spinner" id="spinner">
-      <div class="dots">
-        <div></div>
-        <div></div>
-        <div></div>
-      </div>
-      <div class="spinner-text">Скачиваю, подожди...</div>
-    </div>
-
   </div>
 </div>
 
-<!-- Success Modal -->
 <div class="overlay" id="success-overlay">
   <div class="modal">
     <div class="icon">✅</div>
@@ -208,7 +187,6 @@ input[type=url]::placeholder{color:#38383c}
 const form = document.getElementById('form');
 const urlInput = document.getElementById('url-input');
 const btn = document.getElementById('btn');
-const spinner = document.getElementById('spinner');
 const statusEl = document.getElementById('status');
 const successOverlay = document.getElementById('success-overlay');
 const modalInfo = document.getElementById('modal-info');
@@ -222,11 +200,20 @@ const cfgCleanup = document.getElementById('cfg-cleanup');
 const cfgHours = document.getElementById('cfg-hours');
 const settingsSave = document.getElementById('settings-save');
 
+const progressSection = document.getElementById('progress-section');
+const progressFill = document.getElementById('progress-fill');
+const progressLabel = document.getElementById('progress-label');
+const progressPct = document.getElementById('progress-pct');
+const progressSpeed = document.getElementById('progress-speed');
+const btnCancel = document.getElementById('btn-cancel');
+
+let currentDownloadId = null;
+let pollTimer = null;
+
 // === Format switch → quality visibility ===
 function updateQualityState() {
   qualityRow.style.display = fmtMp3.checked ? 'none' : '';
 }
-
 fmtMp4.addEventListener('change', updateQualityState);
 fmtMp3.addEventListener('change', updateQualityState);
 updateQualityState();
@@ -240,12 +227,181 @@ function setStatus(msg, type) {
   statusEl.textContent = icon + ' ' + msg;
 }
 
-function showSettingsMsg(msg, isError) {
-  setStatus(msg, isError ? 'error' : 'confirm');
-  setTimeout(() => setStatus(), 3000);
+// === Progress UI ===
+function showProgress(label) {
+  progressSection.classList.add('active');
+  progressLabel.textContent = label;
+  progressFill.style.width = '0%';
+  progressPct.textContent = '0%';
+  progressSpeed.textContent = '';
+  btnCancel.style.display = '';
 }
 
-// === Load config ===
+function hideProgress() {
+  progressSection.classList.remove('active');
+  currentDownloadId = null;
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = null;
+}
+
+function updateProgress(data) {
+  const pct = data.percent || 0;
+  progressFill.style.width = pct + '%';
+  progressPct.textContent = pct + '%';
+  progressLabel.textContent = data.message || '';
+
+  if (data.status === 'downloading' && data.percent < 100) {
+    const speedMatch = data.message && data.message.match(/\(([^)]+)\)/);
+    progressSpeed.textContent = speedMatch ? speedMatch[1] : '';
+  } else {
+    progressSpeed.textContent = '';
+  }
+}
+
+function setFormDisabled(disabled) {
+  urlInput.disabled = disabled;
+  document.querySelectorAll('.chip label').forEach(l => {
+    l.classList.toggle('disabled', disabled);
+  });
+  btn.disabled = disabled;
+}
+
+// === Poll progress ===
+function startPolling(downloadId) {
+  currentDownloadId = downloadId;
+  if (pollTimer) clearInterval(pollTimer);
+
+  pollTimer = setInterval(async () => {
+    try {
+      const resp = await fetch('/progress/' + downloadId);
+      const data = await resp.json();
+
+      if (data.status === 'not_found') {
+        hideProgress();
+        setFormDisabled(false);
+        setStatus('Загрузка не найдена', 'error');
+        return;
+      }
+
+      updateProgress(data);
+
+      if (data.status === 'complete') {
+        clearInterval(pollTimer);
+        pollTimer = null;
+        progressFill.style.width = '100%';
+        progressPct.textContent = '100%';
+        progressLabel.textContent = 'Готово';
+        btnCancel.style.display = 'none';
+
+        // Fetch the file
+        const fileResp = await fetch('/file/' + downloadId);
+        if (!fileResp.ok) throw new Error('Ошибка получения файла');
+
+        const disposition = fileResp.headers.get('Content-Disposition');
+        let filename = 'video.mp4';
+        if (disposition) {
+          const m = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+          if (m) filename = m[1].replace(/['"]/g, '');
+        }
+
+        const blob = await fileResp.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl; a.download = filename;
+        document.body.appendChild(a); a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+
+        const size = blob.size > 1048576
+          ? (blob.size / 1048576).toFixed(1) + ' MB'
+          : (blob.size / 1024).toFixed(0) + ' KB';
+
+        modalInfo.textContent = filename + ' (' + size + ')';
+        successOverlay.classList.add('active');
+
+        hideProgress();
+        setFormDisabled(false);
+      }
+
+      if (data.status === 'error') {
+        clearInterval(pollTimer);
+        pollTimer = null;
+        hideProgress();
+        setFormDisabled(false);
+        setStatus(data.message, 'error');
+      }
+
+      if (data.status === 'cancelled') {
+        clearInterval(pollTimer);
+        pollTimer = null;
+        hideProgress();
+        setFormDisabled(false);
+        setStatus('Загрузка отменена', 'error');
+      }
+
+    } catch (err) {
+      clearInterval(pollTimer);
+      pollTimer = null;
+      hideProgress();
+      setFormDisabled(false);
+      setStatus(err.message, 'error');
+    }
+  }, 500);
+}
+
+// === Cancel ===
+btnCancel.addEventListener('click', async function() {
+  if (!currentDownloadId) return;
+  try {
+    await fetch('/cancel/' + currentDownloadId, { method: 'POST' });
+    btnCancel.textContent = 'Отменяем...';
+    btnCancel.disabled = true;
+  } catch (e) {
+    console.error(e);
+  }
+});
+
+// === Download ===
+form.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  setStatus();
+  hideProgress();
+
+  const url = urlInput.value.trim();
+  if (!url) return;
+
+  const format = form.querySelector('input[name="format"]:checked').value;
+  const quality = qualitySelect.value;
+
+  setFormDisabled(true);
+
+  try {
+    const resp = await fetch('/download', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `url=${encodeURIComponent(url)}&format=${format}&quality=${quality}`
+    });
+
+    if (!resp.ok) {
+      const text = await resp.text();
+      setFormDisabled(false);
+      setStatus(text.slice(0, 200), 'error');
+      return;
+    }
+
+    const data = await resp.json();
+    showProgress('Начинаем...');
+    btnCancel.textContent = 'Отменить';
+    btnCancel.disabled = false;
+    startPolling(data.download_id);
+
+  } catch (err) {
+    setFormDisabled(false);
+    setStatus(err.message, 'error');
+  }
+});
+
+// === Config ===
 async function loadConfig() {
   try {
     const resp = await fetch('/api/config');
@@ -259,7 +415,6 @@ async function loadConfig() {
 }
 loadConfig();
 
-// === Save settings ===
 settingsSave.addEventListener('click', async () => {
   try {
     const resp = await fetch('/api/config', {
@@ -273,71 +428,14 @@ settingsSave.addEventListener('click', async () => {
       })
     });
     if (!resp.ok) throw new Error('Ошибка');
-    showSettingsMsg('Настройки сохранены');
+    setStatus('Настройки сохранены', 'confirm');
+    setTimeout(() => setStatus(), 2500);
   } catch(e) {
-    showSettingsMsg('Ошибка сохранения', true);
+    setStatus('Ошибка сохранения', 'error');
   }
 });
 
-// === Toggle ===
 cfgCleanup.addEventListener('click', function() { this.classList.toggle('active') });
-
-// === Download ===
-form.addEventListener('submit', async function(e) {
-  e.preventDefault();
-  setStatus();
-
-  const url = urlInput.value.trim();
-  if (!url) return;
-
-  const format = form.querySelector('input[name="format"]:checked').value;
-  const quality = qualitySelect.value;
-
-  spinner.classList.add('active');
-  btn.disabled = true;
-
-  try {
-    const response = await fetch('/download', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `url=${encodeURIComponent(url)}&format=${format}&quality=${quality}`
-    });
-
-    if (!response.ok) {
-      const text = await response.text();
-      const match = text.match(/Ошибка: (.+)/) || text.match(/(.{1,200})/);
-      throw new Error(match ? match[1] : text.slice(0, 200));
-    }
-
-    let filename = 'video.' + format;
-    const disposition = response.headers.get('Content-Disposition');
-    if (disposition) {
-      const match = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-      if (match) filename = match[1].replace(/['"]/g, '');
-    }
-
-    const blob = await response.blob();
-    const blobUrl = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = blobUrl; a.download = filename;
-    document.body.appendChild(a); a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(blobUrl);
-
-    const size = blob.size > 1048576
-      ? (blob.size / 1048576).toFixed(1) + ' MB'
-      : (blob.size / 1024).toFixed(0) + ' KB';
-
-    modalInfo.textContent = filename + ' (' + size + ')';
-    successOverlay.classList.add('active');
-
-  } catch (err) {
-    setStatus(err.message, 'error');
-  } finally {
-    spinner.classList.remove('active');
-    btn.disabled = false;
-  }
-});
 
 modalBtn.addEventListener('click', () => successOverlay.classList.remove('active'));
 successOverlay.addEventListener('click', e => { if (e.target === successOverlay) successOverlay.classList.remove('active') });
