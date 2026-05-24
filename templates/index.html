@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YT Downloader</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f0f0f;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.container{background:#1a1a1a;border-radius:16px;padding:40px;width:90%;max-width:480px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+h1{font-size:24px;margin-bottom:8px}
+.sub{color:#888;font-size:14px;margin-bottom:24px}
+input[type=url]{width:100%;padding:14px 16px;background:#252525;border:1px solid #333;border-radius:10px;color:#fff;font-size:15px;outline:none;transition:border .2s}
+input[type=url]:focus{border-color:#666}
+input[type=url]::placeholder{color:#666}
+.formats{display:flex;gap:12px;margin:16px 0}
+.formats label{flex:1;padding:12px;background:#252525;border:1px solid #333;border-radius:10px;text-align:center;cursor:pointer;transition:all .2s;font-size:14px}
+.formats label:hover{border-color:#555}
+.formats input{display:none}
+.formats input:checked+span{color:#fff;font-weight:600}
+.formats input:checked ~ .format-label{background:#333}
+.formats label:has(input:checked){border-color:#ff4444;background:#2a1a1a}
+.formats label:has(input:checked) .format-label{color:#fff;font-weight:600}
+.format-label{color:#999}
+button{width:100%;padding:14px;background:#ff4444;border:none;border-radius:10px;color:#fff;font-size:16px;font-weight:600;cursor:pointer;transition:background .2s;margin-top:4px}
+button:hover{background:#e03030}
+button:disabled{background:#552222;cursor:not-allowed}
+.error{background:#2a1515;border:1px solid #ff444455;border-radius:10px;padding:12px;margin-top:16px;font-size:14px;color:#ff6666}
+.spinner{display:none;text-align:center;margin-top:20px}
+.spinner.active{display:block}
+.spinner-dot{display:inline-block;width:8px;height:8px;background:#ff4444;border-radius:50%;margin:0 4px;animation:bounce 1.4s ease-in-out infinite}
+.spinner-dot:nth-child(2){animation-delay:.16s}
+.spinner-dot:nth-child(3){animation-delay:.32s}
+.spinner-text{color:#888;font-size:13px;margin-top:8px}
+@keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>YT Downloader</h1>
+  <p class="sub">Вставь ссылку на YouTube — получи файл</p>
+
+  <form method="post" action="/download" id="form">
+    <input type="url" name="url" placeholder="https://youtube.com/watch?v=..." required>
+
+    <div class="formats">
+      <label>
+        <input type="radio" name="format" value="mp4" checked>
+        <span class="format-label">MP4 (Видео)</span>
+      </label>
+      <label>
+        <input type="radio" name="format" value="mp3">
+        <span class="format-label">MP3 (Аудио)</span>
+      </label>
+    </div>
+
+    <button type="submit" id="btn">Скачать</button>
+  </form>
+
+  <div class="spinner" id="spinner">
+    <div class="spinner-dot"></div>
+    <div class="spinner-dot"></div>
+    <div class="spinner-dot"></div>
+    <p class="spinner-text">Скачиваю, подожди...</p>
+  </div>
+
+  {% if error %}
+  <div class="error">{{ error }}</div>
+  {% endif %}
+</div>
+
+<script>
+document.getElementById('form').addEventListener('submit', function() {
+  document.getElementById('spinner').classList.add('active');
+  document.getElementById('btn').disabled = true;
+});
+</script>
+</body>
+</html>
