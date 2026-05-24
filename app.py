@@ -3,12 +3,16 @@ import time
 import shutil
 import uuid
 import yt_dlp
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, jsonify
+import config as cfg
 
 app = Flask(__name__)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DOWNLOAD_DIR = os.path.join(BASE_DIR, 'downloads')
+
+settings = cfg.load()
+
+DOWNLOAD_DIR = os.path.join(BASE_DIR, settings.get('download_path', 'downloads'))
 FFMPEG_DIR = os.path.join(BASE_DIR, 'bin')
 
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -30,10 +34,27 @@ def progress_hook(d):
 def index():
     return render_template('index.html')
 
+@app.route('/api/config', methods=['GET', 'POST'])
+def api_config():
+    if request.method == 'POST':
+        data = request.get_json()
+        if not data:
+            return 'Нет данных', 400
+        cfg.save(data)
+        global settings, DOWNLOAD_DIR
+        settings = cfg.load()
+        new_dir = os.path.join(BASE_DIR, settings.get('download_path', 'downloads'))
+        if new_dir != DOWNLOAD_DIR:
+            DOWNLOAD_DIR = new_dir
+            os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+        return jsonify(settings)
+    return jsonify(settings)
+
 @app.route('/download', methods=['POST'])
 def download():
     url = request.form.get('url', '').strip()
-    fmt = request.form.get('format', 'mp4')
+    fmt = request.form.get('format', settings.get('default_format', 'mp4'))
+    quality = request.form.get('quality', settings.get('max_quality', '1080'))
 
     if not url:
         return 'Вставь ссылку на YouTube', 400
@@ -62,7 +83,10 @@ def download():
             'preferredquality': '192',
         }]
     else:
-        ydl_opts['format'] = 'best[height<=1080]'
+        if quality == 'max':
+            ydl_opts['format'] = 'best'
+        else:
+            ydl_opts['format'] = f'best[height<={quality}]'
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -113,12 +137,15 @@ def download():
 
 @app.teardown_appcontext
 def cleanup_old_downloads(exc=None):
+    if not settings.get('auto_cleanup', True):
+        return
+    hours = settings.get('cleanup_hours', 1)
     try:
         for item in os.listdir(DOWNLOAD_DIR):
             item_path = os.path.join(DOWNLOAD_DIR, item)
             if os.path.isdir(item_path):
                 age = os.path.getmtime(item_path)
-                if time.time() - age > 3600:
+                if time.time() - age > hours * 3600:
                     shutil.rmtree(item_path, ignore_errors=True)
     except Exception:
         pass
