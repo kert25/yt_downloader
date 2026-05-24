@@ -6,236 +6,389 @@
 <title>YT Downloader</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f0f0f;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh}
-.container{background:#1a1a1a;border-radius:16px;padding:40px;width:90%;max-width:520px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.header h1{font-size:24px;margin:0}
-.sub{color:#888;font-size:14px;margin-bottom:24px}
-input[type=url]{width:100%;padding:14px 16px;background:#252525;border:1px solid #333;border-radius:10px;color:#fff;font-size:15px;outline:none;transition:border .2s}
-input[type=url]:focus{border-color:#666}
-input[type=url]::placeholder{color:#666}
-.formats{display:flex;gap:12px;margin:16px 0}
-.formats label{flex:1;padding:12px;background:#252525;border:1px solid #333;border-radius:10px;text-align:center;cursor:pointer;transition:all .2s;font-size:14px}
-.formats label:hover{border-color:#555}
-.formats input{display:none}
-.formats label:has(input:checked){border-color:#ff4444;background:#2a1a1a}
-.formats label:has(input:checked) .format-label{color:#fff;font-weight:600}
-.format-label{color:#999}
-.row{display:flex;gap:12px;margin:16px 0}
-.row > *{flex:1}
-select{width:100%;padding:14px 16px;background:#252525;border:1px solid #333;border-radius:10px;color:#fff;font-size:14px;outline:none;cursor:pointer;transition:border .2s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='%23666'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
-select:focus{border-color:#666}
-select option{background:#1a1a1a;color:#fff}
-button{width:100%;padding:14px;background:#ff4444;border:none;border-radius:10px;color:#fff;font-size:16px;font-weight:600;cursor:pointer;transition:background .2s;margin-top:4px}
-button:hover{background:#e03030}
-button:disabled{background:#552222;cursor:not-allowed}
-.error{background:#2a1515;border:1px solid #ff444455;border-radius:10px;padding:12px;margin-top:16px;font-size:14px;color:#ff6666}
-.spinner{display:none;align-items:center;justify-content:center;gap:8px;margin-top:20px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#0a0a0b;color:#e8e8ed;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+
+.app{width:100%;max-width:520px}
+
+.card{background:#141416;border:1px solid #222226;border-radius:20px;padding:32px;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;background:#1a1a1e;border-radius:12px;padding:4px;margin-bottom:28px}
+.tab{flex:1;padding:10px 16px;border:none;border-radius:8px;background:transparent;color:#666;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}
+.tab:hover{color:#999}
+.tab.active{background:#ff4444;color:#fff;box-shadow:0 2px 8px rgba(255,68,68,.3)}
+
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* Header */
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+.logo-icon{width:36px;height:36px;background:#ff4444;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0}
+.logo h1{font-size:20px;font-weight:600;letter-spacing:-.3px}
+.logo span{color:#555;font-size:13px}
+
+/* Section */
+.section-title{font-size:13px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+
+/* Form elements */
+.input-wrap{position:relative;margin-bottom:16px}
+.input-wrap .icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#444;font-size:16px;pointer-events:none}
+input[type=url]{width:100%;padding:14px 14px 14px 42px;background:#1c1c20;border:1px solid #28282e;border-radius:12px;color:#e8e8ed;font-size:14px;outline:none;transition:border .2s,box-shadow .2s}
+input[type=url]:focus{border-color:#ff444466;box-shadow:0 0 0 3px rgba(255,68,68,.1)}
+input[type=url]::placeholder{color:#444}
+
+/* Grid for format/quality */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.option-group label{display:block;font-size:12px;color:#555;font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px}
+.option-group select{width:100%;padding:12px 14px;background:#1c1c20;border:1px solid #28282e;border-radius:10px;color:#e8e8ed;font-size:13px;outline:none;cursor:pointer;transition:border .2s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='%23666'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.option-group select:focus{border-color:#ff444466}
+.option-group select option{background:#1c1c20;color:#e8e8ed}
+
+/* Radio chips */
+.chips{display:flex;gap:8px}
+.chip{flex:1;position:relative}
+.chip input{display:none}
+.chip label{display:block;padding:10px;text-align:center;background:#1c1c20;border:1px solid #28282e;border-radius:10px;color:#666;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s}
+.chip label:hover{border-color:#38383e;color:#999}
+.chip input:checked + label{border-color:#ff444466;background:#2a1416;color:#ff4444}
+
+.btn-primary{width:100%;padding:14px;background:#ff4444;border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;margin-top:4px}
+.btn-primary:hover{background:#e03030;box-shadow:0 4px 16px rgba(255,68,68,.25)}
+.btn-primary:disabled{background:#2a1416;color:#552222;cursor:not-allowed;box-shadow:none}
+
+.btn-secondary{width:100%;padding:12px;background:#1c1c20;border:1px solid #28282e;border-radius:10px;color:#999;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}
+.btn-secondary:hover{background:#222228;color:#e8e8ed}
+
+/* Status */
+.status{display:none;align-items:center;gap:10px;margin-top:20px;padding:14px 16px;border-radius:12px;font-size:13px}
+.status.active{display:flex}
+.status.error{background:#1e1212;border:1px solid #441e1e;color:#ff5555}
+.status.success{background:#121e14;border:1px solid #1e4422;color:#55cc66}
+.status.loading{background:#14141e;border:1px solid #28283e;color:#888}
+.status-icon{font-size:16px;flex-shrink:0}
+
+/* Spinner */
+.spinner{display:none;flex-direction:column;align-items:center;gap:12px;margin-top:24px;padding:24px;background:#1c1c20;border-radius:12px}
 .spinner.active{display:flex}
+.spinner-dots{display:flex;gap:6px}
 .spinner-dot{width:8px;height:8px;background:#ff4444;border-radius:50%;animation:bounce 1.4s ease-in-out infinite}
 .spinner-dot:nth-child(2){animation-delay:.16s}
 .spinner-dot:nth-child(3){animation-delay:.32s}
-.spinner-text{color:#888;font-size:13px;margin-top:12px;text-align:center;width:100%}
 @keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);align-items:center;justify-content:center;z-index:100}
-.overlay.active{display:flex}
-.modal{background:#1a1a1a;border-radius:16px;padding:32px;width:90%;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,.6)}
-.modal h2{font-size:20px;margin-bottom:20px}
-.modal label{display:block;color:#999;font-size:13px;margin-bottom:4px;margin-top:16px}
-.modal label:first-child{margin-top:0}
-.modal input[type=text],.modal input[type=number],.modal select{width:100%;padding:12px 14px;background:#252525;border:1px solid #333;border-radius:8px;color:#fff;font-size:14px;outline:none;transition:border .2s}
-.modal input:focus,.modal select:focus{border-color:#666}
-.modal .hint{color:#555;font-size:12px;margin-top:4px}
-.modal .modal-actions{display:flex;gap:12px;margin-top:24px}
-.modal .modal-actions button{flex:1;margin:0}
-.modal .btn-secondary{background:#333;color:#fff}
-.modal .btn-secondary:hover{background:#444}
-.toggle-wrap{display:flex;align-items:center;gap:12px;margin-top:8px}
-.toggle{position:relative;width:44px;height:24px;background:#333;border-radius:12px;cursor:pointer;transition:background .2s;flex-shrink:0}
+.spinner-text{color:#555;font-size:13px}
+
+/* Settings */
+.setting-item{padding:16px 0;border-bottom:1px solid #1c1c20}
+.setting-item:last-child{border-bottom:none;padding-bottom:0}
+.setting-item:first-child{padding-top:0}
+.setting-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.setting-label span{font-size:14px;font-weight:500}
+.setting-label .hint{color:#555;font-size:12px;font-weight:400}
+.setting-item select,.setting-item input[type=text],.setting-item input[type=number]{width:100%;padding:10px 12px;background:#1c1c20;border:1px solid #28282e;border-radius:8px;color:#e8e8ed;font-size:13px;outline:none;transition:border .2s}
+.setting-item select:focus,.setting-item input:focus{border-color:#ff444466}
+.setting-item select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='%23666'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;cursor:pointer}
+
+/* Toggle */
+.toggle-wrap{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid #1c1c20}
+.toggle-wrap:last-of-type{border-bottom:none}
+.toggle-info{display:flex;flex-direction:column;gap:2px}
+.toggle-info .name{font-size:14px;font-weight:500}
+.toggle-info .desc{font-size:12px;color:#555}
+.toggle{position:relative;width:40px;height:22px;background:#28282e;border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0}
 .toggle.active{background:#ff4444}
-.toggle::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s}
-.toggle.active::after{transform:translateX(20px)}
-.btn-icon{background:none;border:none;color:#666;cursor:pointer;padding:6px;border-radius:8px;transition:all .2s;font-size:20px;line-height:1}
-.btn-icon:hover{color:#fff;background:#252525}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .2s}
+.toggle.active::after{transform:translateX(18px)}
+
+/* Overlay / Modal */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
+.overlay.active{display:flex}
+.modal{background:#141416;border:1px solid #222226;border-radius:20px;padding:32px;width:90%;max-width:380px;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,.6);animation:modalIn .25s ease}
+@keyframes modalIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.modal .icon{font-size:44px;margin-bottom:12px}
+.modal h2{font-size:18px;margin-bottom:6px}
+.modal p{color:#666;font-size:13px;margin-bottom:20px}
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="header">
-    <h1>YT Downloader</h1>
-    <button class="btn-icon" id="settings-btn" title="Настройки">⚙️</button>
-  </div>
-  <p class="sub">Вставь ссылку на YouTube — получи файл</p>
 
-  <form id="form">
-    <input type="url" id="url-input" placeholder="https://youtube.com/watch?v=..." required>
+<div class="app">
+  <div class="card">
 
-    <div class="formats">
-      <label>
-        <input type="radio" name="format" value="mp4" id="fmt-mp4">
-        <span class="format-label">MP4 (Видео)</span>
-      </label>
-      <label>
-        <input type="radio" name="format" value="mp3" id="fmt-mp3">
-        <span class="format-label">MP3 (Аудио)</span>
-      </label>
+    <div class="logo">
+      <div class="logo-icon">YT</div>
+      <div>
+        <h1>YT Downloader</h1>
+        <span>Скачивай видео с YouTube</span>
+      </div>
     </div>
 
-    <div class="row">
-      <select name="quality" id="quality">
-        <option value="360">360p</option>
-        <option value="480">480p</option>
-        <option value="720">720p</option>
-        <option value="1080">1080p</option>
-        <option value="max">Максимальное</option>
-      </select>
+    <div class="tabs">
+      <button class="tab active" data-tab="download">Скачать</button>
+      <button class="tab" data-tab="settings">Настройки</button>
     </div>
 
-    <button type="submit" id="btn">Скачать</button>
-  </form>
+    <!-- Download Tab -->
+    <div class="tab-content active" id="tab-download">
 
-  <div class="spinner" id="spinner">
-    <div class="spinner-dot"></div>
-    <div class="spinner-dot"></div>
-    <div class="spinner-dot"></div>
-    <div class="spinner-text">Скачиваю, подожди...</div>
+      <form id="form">
+        <div class="input-wrap">
+          <span class="icon">🔗</span>
+          <input type="url" id="url-input" placeholder="https://youtube.com/watch?v=..." required autocomplete="off">
+        </div>
+
+        <div class="grid-2">
+          <div class="option-group">
+            <label>Формат</label>
+            <div class="chips">
+              <div class="chip">
+                <input type="radio" name="format" value="mp4" id="fmt-mp4">
+                <label for="fmt-mp4">MP4</label>
+              </div>
+              <div class="chip">
+                <input type="radio" name="format" value="mp3" id="fmt-mp3">
+                <label for="fmt-mp3">MP3</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="option-group">
+            <label>Качество</label>
+            <select name="quality" id="quality">
+              <option value="360">360p</option>
+              <option value="480">480p</option>
+              <option value="720">720p</option>
+              <option value="1080">1080p</option>
+              <option value="max">Max</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" id="btn">Скачать</button>
+      </form>
+
+      <div class="spinner" id="spinner">
+        <div class="spinner-dots">
+          <div class="spinner-dot"></div>
+          <div class="spinner-dot"></div>
+          <div class="spinner-dot"></div>
+        </div>
+        <div class="spinner-text">Скачиваю видео, подожди...</div>
+      </div>
+
+      <div class="status" id="status"></div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div class="tab-content" id="tab-settings">
+
+      <div class="setting-item">
+        <div class="setting-label">
+          <span>Формат по умолчанию</span>
+        </div>
+        <select id="cfg-format">
+          <option value="mp4">MP4 (Видео)</option>
+          <option value="mp3">MP3 (Аудио)</option>
+        </select>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-label">
+          <span>Максимальное качество</span>
+        </div>
+        <select id="cfg-quality">
+          <option value="360">360p</option>
+          <option value="480">480p</option>
+          <option value="720">720p</option>
+          <option value="1080">1080p</option>
+          <option value="max">Максимальное</option>
+        </select>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-label">
+          <span>Папка для загрузок</span>
+          <span class="hint">относительно папки приложения</span>
+        </div>
+        <input type="text" id="cfg-path" placeholder="downloads">
+      </div>
+
+      <div class="toggle-wrap">
+        <div class="toggle-info">
+          <span class="name">Автоочистка</span>
+          <span class="desc">Удалять временные файлы через указанное время</span>
+        </div>
+        <div class="toggle" id="cfg-cleanup"></div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-label">
+          <span>Очищать старше (часов)</span>
+        </div>
+        <input type="number" id="cfg-hours" min="1" max="168" value="1">
+      </div>
+
+      <div style="margin-top:20px;display:flex;gap:12px">
+        <button class="btn-secondary" id="settings-reset" style="flex:1">Сбросить</button>
+        <button class="btn-primary" id="settings-save" style="flex:2">Сохранить</button>
+      </div>
+
+      <div class="status" id="settings-status" style="margin-top:12px"></div>
+    </div>
+
   </div>
-
-  <div class="error" id="error" style="display:none"></div>
 </div>
 
-<div class="overlay" id="overlay">
+<!-- Success Modal -->
+<div class="overlay" id="success-overlay">
   <div class="modal">
-    <h2>✅ Скачивание завершено!</h2>
-    <p id="modal-info" style="color:#888;font-size:14px;margin-bottom:20px">Файл сохранён</p>
-    <button id="modal-btn">Отлично</button>
-  </div>
-</div>
-
-<div class="overlay" id="settings-overlay">
-  <div class="modal">
-    <h2>Настройки</h2>
-
-    <label>Формат по умолчанию</label>
-    <select id="cfg-format">
-      <option value="mp4">MP4 (Видео)</option>
-      <option value="mp3">MP3 (Аудио)</option>
-    </select>
-
-    <label>Максимальное качество</label>
-    <select id="cfg-quality">
-      <option value="360">360p</option>
-      <option value="480">480p</option>
-      <option value="720">720p</option>
-      <option value="1080">1080p</option>
-      <option value="max">Максимальное</option>
-    </select>
-
-    <label>Папка для загрузок</label>
-    <input type="text" id="cfg-path" placeholder="downloads">
-    <div class="hint">Относительно папки приложения</div>
-
-    <label>Автоочистка</label>
-    <div class="toggle-wrap">
-      <div class="toggle" id="cfg-cleanup"></div>
-      <span style="color:#888;font-size:14px" id="cfg-cleanup-label">Включена</span>
-    </div>
-
-    <label>Очищать файлы старше (часов)</label>
-    <input type="number" id="cfg-hours" min="1" max="168">
-
-    <div class="modal-actions">
-      <button class="btn-secondary" id="settings-cancel">Отмена</button>
-      <button id="settings-save">Сохранить</button>
-    </div>
+    <div class="icon">✅</div>
+    <h2>Скачивание завершено!</h2>
+    <p id="modal-info">Файл сохранён</p>
+    <button class="btn-primary" id="modal-btn">Отлично</button>
   </div>
 </div>
 
 <script>
+// === DOM refs ===
+const tabs = document.querySelectorAll('.tab');
+const tabContents = document.querySelectorAll('.tab-content');
 const form = document.getElementById('form');
 const urlInput = document.getElementById('url-input');
 const btn = document.getElementById('btn');
 const spinner = document.getElementById('spinner');
-const errorEl = document.getElementById('error');
-const overlay = document.getElementById('overlay');
+const statusEl = document.getElementById('status');
+const successOverlay = document.getElementById('success-overlay');
 const modalInfo = document.getElementById('modal-info');
 const modalBtn = document.getElementById('modal-btn');
 
-const settingsBtn = document.getElementById('settings-btn');
-const settingsOverlay = document.getElementById('settings-overlay');
-const settingsCancel = document.getElementById('settings-cancel');
+// Settings
 const settingsSave = document.getElementById('settings-save');
+const settingsReset = document.getElementById('settings-reset');
+const settingsStatus = document.getElementById('settings-status');
+
+const cfgFormat = document.getElementById('cfg-format');
+const cfgQuality = document.getElementById('cfg-quality');
+const cfgPath = document.getElementById('cfg-path');
+const cfgCleanup = document.getElementById('cfg-cleanup');
+const cfgHours = document.getElementById('cfg-hours');
+
+// === Tab switching ===
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    tabContents.forEach(tc => tc.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    hideStatus();
+  });
+});
+
+// === Status helpers ===
+function showLoading(msg) {
+  statusEl.className = 'status loading active';
+  statusEl.innerHTML = '<span class="status-icon">⏳</span> ' + msg;
+}
 
 function showError(msg) {
-  errorEl.textContent = msg;
-  errorEl.style.display = 'block';
+  statusEl.className = 'status error active';
+  statusEl.innerHTML = '<span class="status-icon">✕</span> ' + msg;
 }
 
-function hideError() {
-  errorEl.style.display = 'none';
+function showSuccess(msg) {
+  statusEl.className = 'status success active';
+  statusEl.innerHTML = '<span class="status-icon">✓</span> ' + msg;
 }
 
-function resetUI() {
-  spinner.classList.remove('active');
-  btn.disabled = false;
+function hideStatus() {
+  statusEl.className = 'status';
 }
 
+function showSettingsStatus(msg, isError) {
+  settingsStatus.className = 'status ' + (isError ? 'error' : 'success') + ' active';
+  settingsStatus.innerHTML = '<span class="status-icon">' + (isError ? '✕' : '✓') + '</span> ' + msg;
+  setTimeout(() => { settingsStatus.className = 'status'; }, 3000);
+}
+
+// === Load config ===
 async function loadConfig() {
   try {
     const resp = await fetch('/api/config');
     const cfg = await resp.json();
+
     document.getElementById('fmt-' + cfg.default_format).checked = true;
     document.getElementById('quality').value = cfg.max_quality;
-    return cfg;
+
+    cfgFormat.value = cfg.default_format;
+    cfgQuality.value = cfg.max_quality;
+    cfgPath.value = cfg.download_path;
+    cfgCleanup.classList.toggle('active', cfg.auto_cleanup);
+    cfgHours.value = cfg.cleanup_hours;
   } catch(e) {
-    console.error('Failed to load config', e);
+    console.error('Config load failed', e);
   }
 }
 
-function fillSettingsForm(cfg) {
-  document.getElementById('cfg-format').value = cfg.default_format;
-  document.getElementById('cfg-quality').value = cfg.max_quality;
-  document.getElementById('cfg-path').value = cfg.download_path;
-  const toggle = document.getElementById('cfg-cleanup');
-  const label = document.getElementById('cfg-cleanup-label');
-  if (cfg.auto_cleanup) {
-    toggle.classList.add('active');
-    label.textContent = 'Включена';
-  } else {
-    toggle.classList.remove('active');
-    label.textContent = 'Выключена';
-  }
-  document.getElementById('cfg-hours').value = cfg.cleanup_hours;
-}
+loadConfig();
 
-async function saveConfig() {
+// === Save settings ===
+settingsSave.addEventListener('click', async () => {
   const data = {
-    default_format: document.getElementById('cfg-format').value,
-    max_quality: document.getElementById('cfg-quality').value,
-    download_path: document.getElementById('cfg-path').value,
-    auto_cleanup: document.getElementById('cfg-cleanup').classList.contains('active'),
-    cleanup_hours: parseInt(document.getElementById('cfg-hours').value) || 1
+    default_format: cfgFormat.value,
+    max_quality: cfgQuality.value,
+    download_path: cfgPath.value,
+    auto_cleanup: cfgCleanup.classList.contains('active'),
+    cleanup_hours: parseInt(cfgHours.value) || 1
   };
-  const resp = await fetch('/api/config', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-  if (resp.ok) {
+  try {
+    const resp = await fetch('/api/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!resp.ok) throw new Error('Ошибка сохранения');
     const cfg = await resp.json();
-    fillSettingsForm(cfg);
+
     document.getElementById('fmt-' + cfg.default_format).checked = true;
     document.getElementById('quality').value = cfg.max_quality;
-    settingsOverlay.classList.remove('active');
+
+    showSettingsStatus('Настройки сохранены');
+  } catch(e) {
+    showSettingsStatus('Ошибка: ' + e.message, true);
   }
-}
+});
 
-let currentConfig = {};
-loadConfig().then(cfg => { if (cfg) currentConfig = cfg; });
+// === Reset settings ===
+settingsReset.addEventListener('click', async () => {
+  const defaults = {
+    default_format: 'mp4',
+    max_quality: '1080',
+    download_path: 'downloads',
+    auto_cleanup: true,
+    cleanup_hours: 1
+  };
+  try {
+    const resp = await fetch('/api/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(defaults)
+    });
+    if (!resp.ok) throw new Error('Ошибка');
+    await loadConfig();
+    showSettingsStatus('Настройки сброшены');
+  } catch(e) {
+    showSettingsStatus('Ошибка: ' + e.message, true);
+  }
+});
 
+// === Toggle component ===
+cfgCleanup.addEventListener('click', function() {
+  this.classList.toggle('active');
+});
+
+// === Download ===
 form.addEventListener('submit', async function(e) {
   e.preventDefault();
-  hideError();
+  hideStatus();
 
   const url = urlInput.value.trim();
   if (!url) return;
@@ -280,43 +433,23 @@ form.addEventListener('submit', async function(e) {
       ? (blob.size / 1048576).toFixed(1) + ' MB'
       : (blob.size / 1024).toFixed(0) + ' KB';
 
-    modalInfo.textContent = `${filename} (${size})`;
-    overlay.classList.add('active');
+    modalInfo.textContent = filename + ' (' + size + ')';
+    successOverlay.classList.add('active');
 
   } catch (err) {
     showError(err.message);
   } finally {
-    resetUI();
+    spinner.classList.remove('active');
+    btn.disabled = false;
   }
 });
 
 modalBtn.addEventListener('click', function() {
-  overlay.classList.remove('active');
+  successOverlay.classList.remove('active');
 });
 
-overlay.addEventListener('click', function(e) {
-  if (e.target === overlay) overlay.classList.remove('active');
-});
-
-settingsBtn.addEventListener('click', function() {
-  fillSettingsForm(currentConfig);
-  settingsOverlay.classList.add('active');
-});
-
-settingsCancel.addEventListener('click', function() {
-  settingsOverlay.classList.remove('active');
-});
-
-settingsOverlay.addEventListener('click', function(e) {
-  if (e.target === settingsOverlay) settingsOverlay.classList.remove('active');
-});
-
-settingsSave.addEventListener('click', saveConfig);
-
-document.getElementById('cfg-cleanup').addEventListener('click', function() {
-  this.classList.toggle('active');
-  document.getElementById('cfg-cleanup-label').textContent =
-    this.classList.contains('active') ? 'Включена' : 'Выключена';
+successOverlay.addEventListener('click', function(e) {
+  if (e.target === successOverlay) successOverlay.classList.remove('active');
 });
 </script>
 </body>
