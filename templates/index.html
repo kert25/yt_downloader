@@ -80,14 +80,6 @@ input[type=url]:disabled{opacity:.4;cursor:not-allowed}
 .status-confirm{background:#0e0e14;border:1px solid #1a1a22;color:#666}
 .status-icon{font-size:14px;flex-shrink:0}
 
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
-.overlay.active{display:flex}
-.modal{background:#111113;border:1px solid #1e1e22;border-radius:20px;padding:28px;width:90%;max-width:340px;text-align:center}
-.modal .icon{font-size:40px;margin-bottom:10px}
-.modal h2{font-size:17px;margin-bottom:4px}
-.modal p{color:#555;font-size:13px;margin-bottom:18px}
-.modal button{width:100%;padding:12px;background:#ff4444;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s}
-.modal button:hover{background:#e03030}
 </style>
 </head>
 <body>
@@ -174,23 +166,11 @@ input[type=url]:disabled{opacity:.4;cursor:not-allowed}
   </div>
 </div>
 
-<div class="overlay" id="success-overlay">
-  <div class="modal">
-    <div class="icon">✅</div>
-    <h2>Скачивание завершено!</h2>
-    <p id="modal-info">Файл сохранён</p>
-    <button id="modal-btn">Отлично</button>
-  </div>
-</div>
-
 <script>
 const form = document.getElementById('form');
 const urlInput = document.getElementById('url-input');
 const btn = document.getElementById('btn');
 const statusEl = document.getElementById('status');
-const successOverlay = document.getElementById('success-overlay');
-const modalInfo = document.getElementById('modal-info');
-const modalBtn = document.getElementById('modal-btn');
 
 const qualityRow = document.getElementById('quality-row');
 const qualitySelect = document.getElementById('cfg-quality');
@@ -312,15 +292,15 @@ function startPolling(downloadId) {
         document.body.removeChild(a);
         URL.revokeObjectURL(blobUrl);
 
+        hideProgress();
+        setFormDisabled(false);
+
         const size = blob.size > 1048576
           ? (blob.size / 1048576).toFixed(1) + ' MB'
           : (blob.size / 1024).toFixed(0) + ' KB';
 
-        modalInfo.textContent = filename + ' (' + size + ')';
-        successOverlay.classList.add('active');
-
-        hideProgress();
-        setFormDisabled(false);
+        setStatus('✓ Скачено: ' + filename + ' (' + size + ')', 'success');
+        setTimeout(() => setStatus(), 5000);
       }
 
       if (data.status === 'error') {
@@ -436,9 +416,6 @@ settingsSave.addEventListener('click', async () => {
 });
 
 cfgCleanup.addEventListener('click', function() { this.classList.toggle('active') });
-
-modalBtn.addEventListener('click', () => successOverlay.classList.remove('active'));
-successOverlay.addEventListener('click', e => { if (e.target === successOverlay) successOverlay.classList.remove('active') });
 </script>
 </body>
 </html>
