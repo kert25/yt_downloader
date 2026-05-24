@@ -299,7 +299,7 @@ function startPolling(downloadId) {
           ? (blob.size / 1048576).toFixed(1) + ' MB'
           : (blob.size / 1024).toFixed(0) + ' KB';
 
-        setStatus('✓ Скачено: ' + filename + ' (' + size + ')', 'success');
+        setStatus('Скачано: ' + filename + ' (' + size + ')', 'success');
         setTimeout(() => setStatus(), 5000);
       }
 
