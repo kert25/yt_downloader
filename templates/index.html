@@ -235,8 +235,9 @@ updateQualityState();
 function setStatus(msg, type) {
   if (!msg) { statusEl.className = 'status'; return }
   statusEl.className = 'status active ' + (type || '');
-  const icons = {loading:'⏳', error:'✕', success:'✓', confirm:'💾'};
-  statusEl.innerHTML = '<span class="status-icon">' + (icons[type] || '') + '</span> ' + msg;
+  const icons = {'loading':'⏳','error':'✕','success':'✓','confirm':'💾'};
+  const icon = icons[type] || '';
+  statusEl.textContent = icon + ' ' + msg;
 }
 
 function showSettingsMsg(msg, isError) {
