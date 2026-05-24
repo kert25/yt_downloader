@@ -1,5 +1,6 @@
 import os
 import time
+import html
 import shutil
 import uuid
 import yt_dlp
@@ -7,8 +8,10 @@ from flask import Flask, render_template, request, send_file, jsonify
 import config as cfg
 
 app = Flask(__name__)
+app.secret_key = os.urandom(32).hex()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+VALID_QUALITIES = {'360', '480', '720', '1080', 'max'}
 
 settings = cfg.load()
 
@@ -19,6 +22,9 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 FFMPEG_PATH = shutil.which('ffmpeg', path=FFMPEG_DIR) or shutil.which('ffmpeg')
 FFPROBE_PATH = shutil.which('ffprobe', path=FFMPEG_DIR) or shutil.which('ffprobe')
+
+def sanitize_error(msg):
+    return html.escape(msg, quote=False)
 
 def progress_hook(d):
     if d['status'] == 'downloading':
@@ -40,6 +46,32 @@ def api_config():
         data = request.get_json()
         if not data:
             return 'Нет данных', 400
+
+        if 'download_path' in data:
+            path = data['download_path'].strip()
+            if not path or '..' in path.split(os.sep) or path.startswith('/') or path.startswith('~'):
+                return 'Недопустимый путь загрузки', 400
+            data['download_path'] = path
+
+        if 'max_quality' in data and data['max_quality'] not in VALID_QUALITIES:
+            return 'Недопустимое качество', 400
+
+        if 'cleanup_hours' in data:
+            try:
+                h = int(data['cleanup_hours'])
+                if h < 1 or h > 168:
+                    raise ValueError
+                data['cleanup_hours'] = h
+            except (TypeError, ValueError):
+                return 'Недопустимое значение часов', 400
+
+        if 'auto_cleanup' in data:
+            data['auto_cleanup'] = bool(data['auto_cleanup'])
+
+        if 'default_format' in data:
+            if data['default_format'] not in ('mp4', 'mp3'):
+                return 'Недопустимый формат', 400
+
         cfg.save(data)
         global settings, DOWNLOAD_DIR
         settings = cfg.load()
@@ -59,6 +91,14 @@ def download():
     if not url:
         return 'Вставь ссылку на YouTube', 400
 
+    if fmt not in ('mp4', 'mp3'):
+        return 'Недопустимый формат', 400
+
+    if quality not in VALID_QUALITIES:
+        quality = settings.get('max_quality', '1080')
+        if quality not in VALID_QUALITIES:
+            quality = '1080'
+
     download_id = uuid.uuid4().hex[:8]
     download_path = os.path.join(DOWNLOAD_DIR, download_id)
     os.makedirs(download_path, exist_ok=True)
@@ -70,6 +110,8 @@ def download():
         'quiet': True,
         'no_warnings': True,
         'progress_hooks': [progress_hook],
+        'max_filesize': 4 * 1024 * 1024 * 1024,
+        'socket_timeout': 30,
     }
 
     if FFMPEG_PATH:
@@ -83,10 +125,7 @@ def download():
             'preferredquality': '192',
         }]
     else:
-        if quality == 'max':
-            ydl_opts['format'] = 'best'
-        else:
-            ydl_opts['format'] = f'best[height<={quality}]'
+        ydl_opts['format'] = 'best' if quality == 'max' else f'best[height<={quality}]'
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -133,7 +172,7 @@ def download():
         error_msg = str(e)
         if 'ffmpeg' in error_msg.lower() and fmt == 'mp3':
             error_msg = 'ffmpeg не найден. MP3 недоступен. Попробуй MP4.'
-        return f'Ошибка: {error_msg}', 500
+        return f'Ошибка: {sanitize_error(error_msg)}', 500
 
 @app.teardown_appcontext
 def cleanup_old_downloads(exc=None):
@@ -151,4 +190,5 @@ def cleanup_old_downloads(exc=None):
         pass
 
 if __name__ == '__main__':
-    app.run(debug=True, threaded=True, host='127.0.0.1', port=5000)
+    debug_mode = os.environ.get('YT_DEBUG', '').lower() in ('1', 'true', 'yes')
+    app.run(debug=debug_mode, threaded=True, host='127.0.0.1', port=5000)
