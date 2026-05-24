@@ -36,7 +36,7 @@ def download():
     fmt = request.form.get('format', 'mp4')
 
     if not url:
-        return render_template('index.html', error='Вставь ссылку на YouTube')
+        return 'Вставь ссылку на YouTube', 400
 
     download_id = uuid.uuid4().hex[:8]
     download_path = os.path.join(DOWNLOAD_DIR, download_id)
@@ -70,7 +70,7 @@ def download():
 
         files = os.listdir(download_path)
         if not files:
-            return render_template('index.html', error='Не удалось найти скачанный файл')
+            return 'Не удалось найти скачанный файл', 500
 
         if fmt == 'mp3':
             mp3_files = [f for f in files if f.endswith('.mp3')]
@@ -109,7 +109,7 @@ def download():
         error_msg = str(e)
         if 'ffmpeg' in error_msg.lower() and fmt == 'mp3':
             error_msg = 'ffmpeg не найден. MP3 недоступен. Попробуй MP4.'
-        return render_template('index.html', error=f'Ошибка: {error_msg}')
+        return f'Ошибка: {error_msg}', 500
 
 @app.teardown_appcontext
 def cleanup_old_downloads(exc=None):
