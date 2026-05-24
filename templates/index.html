@@ -21,9 +21,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 .columns{display:grid;grid-template-columns:1fr 240px;gap:32px}
 @media(max-width:700px){.columns{grid-template-columns:1fr;gap:24px}}
 
-/* Column labels */
-.col-label{font-size:11px;font-weight:600;color:#333;text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px}
-
 /* Download column */
 .input-wrap{position:relative;margin-bottom:14px}
 .input-wrap .icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#333;font-size:14px;pointer-events:none;line-height:1}
@@ -62,12 +59,9 @@ input[type=url]::placeholder{color:#38383c}
 .toggle-switch.active::after{transform:translateX(16px)}
 .toggle-hint{font-size:11px;color:#333;margin-top:2px}
 
-.setting-actions{display:flex;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid #1a1a1e}
-.setting-actions button{flex:1;padding:8px;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
-.btn-save{background:#ff444422;color:#ff4444}
+.setting-actions{margin-top:16px;padding-top:14px;border-top:1px solid #1a1a1e}
+.btn-save{width:100%;padding:9px;border:none;border-radius:8px;background:#ff444422;color:#ff4444;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
 .btn-save:hover{background:#ff444433}
-.btn-reset{background:#18181c;color:#555}
-.btn-reset:hover{background:#1e1e22;color:#888}
 
 /* Status bar */
 .status-bar{margin-top:20px;padding:0 4px}
@@ -108,15 +102,12 @@ input[type=url]::placeholder{color:#38383c}
     <div class="header">
       <div class="header-logo">YT</div>
       <h1>YT Downloader</h1>
-      <span>YouTube → MP4 / MP3</span>
     </div>
 
     <div class="columns">
 
       <!-- Left: Download -->
       <div>
-        <div class="col-label">Скачать</div>
-
         <form id="form">
           <div class="input-wrap">
             <span class="icon">🔗</span>
@@ -140,28 +131,18 @@ input[type=url]::placeholder{color:#38383c}
 
       <!-- Right: Settings -->
       <div>
-        <div class="col-label">Настройки</div>
-
         <div class="settings">
-          <div class="setting">
+          <div class="setting" id="quality-row">
             <div class="setting-label">
-              <span id="quality-label">Качество видео</span>
+              <span>Качество</span>
             </div>
             <select id="cfg-quality">
               <option value="360">360p</option>
               <option value="480">480p</option>
               <option value="720">720p</option>
               <option value="1080">1080p</option>
-              <option value="max">Максимальное</option>
+              <option value="max">Макс.</option>
             </select>
-          </div>
-
-          <div class="setting">
-            <div class="setting-label">
-              <span>Папка загрузок</span>
-              <span class="hint">отн.</span>
-            </div>
-            <input type="text" id="cfg-path" placeholder="downloads">
           </div>
 
           <div class="setting">
@@ -176,13 +157,12 @@ input[type=url]::placeholder{color:#38383c}
 
           <div class="setting">
             <div class="setting-label">
-              <span>Старше (часов)</span>
+              <span>Очищать через (ч)</span>
             </div>
             <input type="number" id="cfg-hours" min="1" max="168" value="1">
           </div>
 
           <div class="setting-actions">
-            <button class="btn-reset" id="settings-reset">Сброс</button>
             <button class="btn-save" id="settings-save">Сохранить</button>
           </div>
         </div>
@@ -227,21 +207,17 @@ const successOverlay = document.getElementById('success-overlay');
 const modalInfo = document.getElementById('modal-info');
 const modalBtn = document.getElementById('modal-btn');
 
+const qualityRow = document.getElementById('quality-row');
 const qualitySelect = document.getElementById('cfg-quality');
-const qualityLabel = document.getElementById('quality-label');
 const fmtMp4 = document.getElementById('fmt-mp4');
 const fmtMp3 = document.getElementById('fmt-mp3');
 const cfgCleanup = document.getElementById('cfg-cleanup');
-const cfgPath = document.getElementById('cfg-path');
 const cfgHours = document.getElementById('cfg-hours');
 const settingsSave = document.getElementById('settings-save');
-const settingsReset = document.getElementById('settings-reset');
 
 // === Format switch → quality visibility ===
 function updateQualityState() {
-  const isMp3 = fmtMp3.checked;
-  qualitySelect.disabled = isMp3;
-  qualityLabel.textContent = isMp3 ? 'Качество аудио' : 'Качество видео';
+  qualityRow.style.display = fmtMp3.checked ? 'none' : '';
 }
 
 fmtMp4.addEventListener('change', updateQualityState);
@@ -268,7 +244,6 @@ async function loadConfig() {
     const cfg = await resp.json();
     document.getElementById('fmt-' + cfg.default_format).checked = true;
     qualitySelect.value = cfg.max_quality;
-    cfgPath.value = cfg.download_path;
     cfgCleanup.classList.toggle('active', cfg.auto_cleanup);
     cfgHours.value = cfg.cleanup_hours;
     updateQualityState();
@@ -276,7 +251,7 @@ async function loadConfig() {
 }
 loadConfig();
 
-// === Save / Reset settings ===
+// === Save settings ===
 settingsSave.addEventListener('click', async () => {
   try {
     const resp = await fetch('/api/config', {
@@ -285,7 +260,6 @@ settingsSave.addEventListener('click', async () => {
       body: JSON.stringify({
         default_format: form.querySelector('input[name="format"]:checked').value,
         max_quality: qualitySelect.value,
-        download_path: cfgPath.value,
         auto_cleanup: cfgCleanup.classList.contains('active'),
         cleanup_hours: parseInt(cfgHours.value) || 1
       })
@@ -294,24 +268,6 @@ settingsSave.addEventListener('click', async () => {
     showSettingsMsg('Настройки сохранены');
   } catch(e) {
     showSettingsMsg('Ошибка сохранения', true);
-  }
-});
-
-settingsReset.addEventListener('click', async () => {
-  try {
-    const resp = await fetch('/api/config', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        default_format: 'mp4', max_quality: '1080',
-        download_path: 'downloads', auto_cleanup: true, cleanup_hours: 1
-      })
-    });
-    if (!resp.ok) throw new Error('Ошибка');
-    await loadConfig();
-    showSettingsMsg('Настройки сброшены');
-  } catch(e) {
-    showSettingsMsg('Ошибка сброса', true);
   }
 });
 
