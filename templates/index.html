@@ -157,6 +157,7 @@ const urlInput = document.getElementById('url-input');
 const btn = document.getElementById('btn');
 const spinner = document.getElementById('spinner');
 const errorEl = document.getElementById('error');
+const errorText = document.getElementById('error-text');
 const overlay = document.getElementById('overlay');
 const modalInfo = document.getElementById('modal-info');
 const modalBtn = document.getElementById('modal-btn');
@@ -167,8 +168,8 @@ const settingsCancel = document.getElementById('settings-cancel');
 const settingsSave = document.getElementById('settings-save');
 
 function showError(msg) {
-  errorEl.textContent = msg;
-  errorEl.style.display = 'block';
+  errorText.textContent = msg;
+  errorEl.style.display = 'flex';
 }
 
 function hideError() {
